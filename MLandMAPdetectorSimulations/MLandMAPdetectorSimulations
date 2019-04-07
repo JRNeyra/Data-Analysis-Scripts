@@ -1,0 +1,56 @@
+#########################################################
+# Description: This script generates 1000 random bits
+# and transfers them through a simulated binary symmetric
+# channel, then it performs ML and MAP detection
+# algorithms and calculates the error at the receiver.
+# Author: Jose Neyra
+#########################################################
+
+
+import numpy as np
+
+# Transmit the bits through the channel
+# Simulates a binary symmetric channel with transition probability p
+def bsc(txBits, p):
+    flips = np.zeros((N,), dtype='bool')  # there are no flips at this point
+    x = np.random.rand(N)
+    flips[x < p] = True
+    rxBits = np.logical_xor(txBits, flips)
+    return rxBits
+
+
+# Perform both ML and MAP detection at the receiver
+def MLDetector(rxBits):  # simulates an ML Detector, assumes p < 0.5
+    return rxBits
+
+
+# Simulates a MAP detector
+def MAPDetector(rxBits, q, p):
+    if q < p:
+        return np.ones((N,), dtype='bool')
+    if p < q <= 1 - p:
+        return rxBits
+    if q > 1 - p:
+        return np.zeros((N,), dtype='bool')
+
+
+# Set q and p probabilities
+q = 0.8    # Probability of sending a 0
+p = 0.3    # Probability of bit flipping in channel
+N = 10000  # Number of bits to transfer
+
+# Generate random bits
+txBits = np.zeros((N,), dtype='bool')
+txBits[np.random.rand(N) > q] = True
+
+rxBits = bsc(txBits, p)
+
+MLEstimates = MLDetector(rxBits)
+MAPEstimates = MAPDetector(rxBits, q, p)
+print(MAPEstimates)
+
+# Calculate probability of error
+PEML = np.sum(np.logical_xor(txBits, MLEstimates))/N
+PEMAP = np.sum(np.logical_xor(txBits, MAPEstimates))/N
+print('Probability of error for ML estimator is %f' % PEML)
+print('Probability of error for MAP estimator is %f' % PEMAP)
